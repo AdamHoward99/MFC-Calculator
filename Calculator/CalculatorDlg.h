@@ -4,6 +4,15 @@
 
 #pragma once
 #include <unordered_map>
+#include <string>
+#include <vector>
+
+struct Operation
+{
+	const double number;
+	const char operation;
+};
+
 
 // CCalculatorDlg dialog
 class CCalculatorDlg : public CDialogEx
@@ -32,11 +41,12 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 private:
-	CString historyTxt;
-	CString OutputTxt;
+	std::string m_outputText;
+	CString m_historyText;
 
 	CFont font;
 	//std::unordered_map<std::string, CButton> m_uiButtons;
+	std::vector<CButton> m_uiButtons;
 	CButton num0;
 	CButton num1;
 	CButton num2;
@@ -47,18 +57,24 @@ private:
 	CButton num7;
 	CButton num8;
 	CButton num9;
+	CButton clearButton;
+	CButton decimalButton;
+	CButton divideButton;
+	CButton equalsButton;
+	CButton minusButton;
+	CButton multiplyButton;
+	CButton addButton;
 
-	void AddDigitToOutput(char);
+	CEdit historyBox;
+	CEdit outputBox;
+
+	char m_lastInput;
+
+	std::vector<Operation> m_sum;
+
+	void AddCharToOutput(const char);
+	void AddNumberToSum(const char);
+
 public:
 	afx_msg void OnButtonClick(UINT nID);
-	afx_msg void OnBnClickedButtonNum0();
-	afx_msg void OnBnClickedButtonNum1();
-	afx_msg void OnBnClickedButtonNum2();
-	afx_msg void OnBnClickedButtonNum3();
-	afx_msg void OnBnClickedButtonNum4();
-	afx_msg void OnBnClickedButtonNum5();
-	afx_msg void OnBnClickedButtonNum6();
-	afx_msg void OnBnClickedButtonNum7();
-	afx_msg void OnBnClickedButtonNum8();
-	afx_msg void OnBnClickedButtonNum9();
 };

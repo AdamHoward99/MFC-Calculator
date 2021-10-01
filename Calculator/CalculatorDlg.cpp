@@ -52,8 +52,8 @@ END_MESSAGE_MAP()
 
 CCalculatorDlg::CCalculatorDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_CALCULATOR_DIALOG, pParent)
-	, historyTxt(_T(""))
-	, OutputTxt(_T(""))
+	, m_outputText(_T(""))
+	, m_historyText(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -61,25 +61,13 @@ CCalculatorDlg::CCalculatorDlg(CWnd* pParent /*=nullptr*/)
 void CCalculatorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Text(pDX, IDC_EDIT_HISTORY, historyTxt);
-	DDX_Text(pDX, IDC_EDIT_OUTPUT, OutputTxt);
 }
 
 BEGIN_MESSAGE_MAP(CCalculatorDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_CONTROL_RANGE(BN_CLICKED, 10, 20, &CCalculatorDlg::OnButtonClick)
-
-	ON_BN_CLICKED(IDC_BUTTON_NUM_1, &CCalculatorDlg::OnBnClickedButtonNum1)
-	ON_BN_CLICKED(IDC_BUTTON_NUM_2, &CCalculatorDlg::OnBnClickedButtonNum2)
-	ON_BN_CLICKED(IDC_BUTTON_NUM_3, &CCalculatorDlg::OnBnClickedButtonNum3)
-	ON_BN_CLICKED(IDC_BUTTON_NUM_4, &CCalculatorDlg::OnBnClickedButtonNum4)
-	ON_BN_CLICKED(IDC_BUTTON_NUM_5, &CCalculatorDlg::OnBnClickedButtonNum5)
-	ON_BN_CLICKED(IDC_BUTTON_NUM_6, &CCalculatorDlg::OnBnClickedButtonNum6)
-	ON_BN_CLICKED(IDC_BUTTON_NUM_7, &CCalculatorDlg::OnBnClickedButtonNum7)
-	ON_BN_CLICKED(IDC_BUTTON_NUM_8, &CCalculatorDlg::OnBnClickedButtonNum8)
-	ON_BN_CLICKED(IDC_BUTTON_NUM_9, &CCalculatorDlg::OnBnClickedButtonNum9)
+	ON_CONTROL_RANGE(BN_CLICKED, 10, 26, &CCalculatorDlg::OnButtonClick)
 END_MESSAGE_MAP()
 
 
@@ -117,20 +105,31 @@ BOOL CCalculatorDlg::OnInitDialog()
 	// TODO: Add extra initialization here
 	//Function to initialize all calculator buttons
 	num0.Create(_T("0"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 345, 112, 395), this, 10);
-	num1.Create(_T("1"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 271, 112, 325), this, 20);
-	num2.Create(_T("2"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 271, 194, 325), this, 30);
-	num3.Create(_T("3"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 271, 277, 325), this, 40);
-	num4.Create(_T("4"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 200, 112, 254), this, 50);
-	num5.Create(_T("5"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 200, 194, 254), this, 60);
-	num6.Create(_T("6"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 200, 277, 254), this, 70);
-	num7.Create(_T("7"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 128, 112, 182), this, 80);
-	num8.Create(_T("8"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 128, 194, 182), this, 90);
-	num9.Create(_T("9"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 128, 277, 182), this, 100);
-	
+	num1.Create(_T("1"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 271, 112, 325), this, 11);
+	num2.Create(_T("2"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 271, 194, 325), this, 12);
+	num3.Create(_T("3"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 271, 277, 325), this, 13);
+	num4.Create(_T("4"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 200, 112, 254), this, 14);
+	num5.Create(_T("5"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 200, 194, 254), this, 15);
+	num6.Create(_T("6"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 200, 277, 254), this, 16);
+	num7.Create(_T("7"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 128, 112, 182), this, 17);
+	num8.Create(_T("8"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 128, 194, 182), this, 18);
+	num9.Create(_T("9"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 128, 277, 182), this, 19);
 
-	font.CreateFontW(32, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
-		0, 0, 0, 0, _T("Microsoft Sans Serif"));
+	decimalButton.Create(_T("."), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 345, 194, 395), this, 20);
+	equalsButton.Create(_T("="), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 345, 277, 395), this, 21);
+	addButton.Create(_T("+"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 354, 366, 395), this, 22);
+	minusButton.Create(_T("-"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 299, 366, 340), this, 23);
+	multiplyButton.Create(_T("x"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 242, 366, 283), this, 24);
+	divideButton.Create(_T("/"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 185, 366, 226), this, 25);
+	clearButton.Create(_T("C"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 128, 366, 169), this, 26);
 
+	historyBox.Create(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOVSCROLL | ES_READONLY | ES_MULTILINE | WS_VSCROLL, CRect(11, 414, 421, 468), this, 27);
+	outputBox.Create(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), this, 28);
+
+	font.CreateFontA(32, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
+		0, 0, 0, 0, _T("Digital-7"));
+
+	outputBox.SetFont(&font);
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -183,69 +182,146 @@ HCURSOR CCalculatorDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CCalculatorDlg::AddDigitToOutput(char num)
+void CCalculatorDlg::AddCharToOutput(const char txt)
 {
-	OutputTxt += num;
+	m_outputText += txt;
+	m_lastInput = txt;
+	outputBox.SetWindowTextA(m_outputText.c_str());
 	UpdateData(FALSE);		//FALSE updates window based on new variable value, true takes window value and assigns it to variable
 }
 
-void CCalculatorDlg::OnBnClickedButtonNum0()
+void CCalculatorDlg::AddNumberToSum(const char op)
 {
-	//Obtains the position on the window of the button
-	AddDigitToOutput('0');
-}
+	size_t start, size = 0;
 
+	start = m_outputText.size();
+	char* c = &m_outputText[m_outputText.size() - 1];
 
-void CCalculatorDlg::OnBnClickedButtonNum1()
-{
-	AddDigitToOutput('1');
-}
+	do
+	{
+		start--;
+		size++;
+		c--;
+	} while (start >= 0 && (*c > 47 && *c < 58) || *c == '.');
 
-void CCalculatorDlg::OnBnClickedButtonNum2()
-{
-	AddDigitToOutput('2');
-}
+	std::string te = m_outputText.substr(start, size);
 
-void CCalculatorDlg::OnBnClickedButtonNum3()
-{
-	AddDigitToOutput('3');
-}
-
-void CCalculatorDlg::OnBnClickedButtonNum4()
-{
-	AddDigitToOutput('4');
-}
-
-void CCalculatorDlg::OnBnClickedButtonNum5()
-{
-	AddDigitToOutput('5');
-}
-
-void CCalculatorDlg::OnBnClickedButtonNum6()
-{
-	AddDigitToOutput('6');
-}
-
-void CCalculatorDlg::OnBnClickedButtonNum7()
-{
-	AddDigitToOutput('7');
-}
-
-void CCalculatorDlg::OnBnClickedButtonNum8()
-{
-	AddDigitToOutput('8');
-}
-
-void CCalculatorDlg::OnBnClickedButtonNum9()
-{
-	CRect ex;
-	GetDlgItem(IDC_BUTTON_NUM_9)->GetWindowRect(ex);
-	ScreenToClient(&ex);
-	AddDigitToOutput('9');
+	m_sum.push_back({ std::stod(m_outputText.substr(start, size)), *c });
 }
 
 void CCalculatorDlg::OnButtonClick(UINT nID)
 {
+	if (nID < 20)		//10-19 is number buttons, put this in a bool check function maybe
+	{
+		AddCharToOutput('0' + (nID - 10));
+		return;
+	}
+
+	switch (nID)
+	{
+	case 20:		//Decimal Point
+		if(m_outputText.length() > 0 && m_outputText.find('.') == -1)		//number has to be present, only 1 decimal point allowed
+			AddCharToOutput('.');
+		break;
+
+	case 21:		//Equals
+		if (m_outputText.length() > 0)
+		{
+
+			if (!(m_lastInput > 47 && m_lastInput < 58))
+				m_outputText.pop_back();
+
+			AddNumberToSum('=');
+			AddCharToOutput('=');
+
+			double total = 0.0f;
+			//Do the sum and clear the text
+			for (Operation &var : m_sum)
+			{
+				switch (var.operation)
+				{
+				case '-':
+					total -= var.number;
+					break;
+
+				case '+':
+					total += var.number;
+					break;
+
+				case 'x':
+					total *= var.number;
+					break;
+
+				case '/':
+					total /= var.number;
+					break;
+
+				case '=':
+					break;
+
+				default:
+					total = var.number;
+					break;
+				}
+			}
+
+			m_outputText.clear();
+			outputBox.SetWindowTextA(m_outputText.c_str());
+			UpdateData(FALSE);
+
+			outputBox.SetWindowTextA(std::to_string(total).c_str());
+
+		}
+
+		break;
+
+	case 22:		//Add
+		//needs to have number in front of it, if - is before replace with +, add number before sign into a vector
+		if (m_lastInput > 47 && m_lastInput < 58 && m_outputText.length() > 0)		//TODO IMPROVE
+		{
+			AddNumberToSum('+');		//Adds number before operation to sum vector
+			AddCharToOutput('+');
+		}
+		break;
+
+	case 23:	//Subtract
+		if (m_lastInput > 47 && m_lastInput < 58)		//TODO IMPROVE
+		{
+			AddNumberToSum('-');
+			AddCharToOutput('-');
+		}
+		break;
+
+	case 24:	//Multiply
+		if (m_lastInput > 47 && m_lastInput < 58 && m_outputText.length() > 0)
+		{
+			AddNumberToSum('x');
+			AddCharToOutput('x');
+		}
+		break;
+
+	case 25:	//Divide
+		if (m_lastInput > 47 && m_lastInput < 58 && m_outputText.length() > 0)
+		{
+			AddNumberToSum('/');
+			AddCharToOutput('/');
+		}
+		break;
+
+
+	case 26:		//Clear
+		m_outputText.clear();
+		outputBox.SetWindowTextA(m_outputText.c_str());
+		break;
+	}
+	//else
+	//{
+	//	CRect x;
+	//	GetDlgItem(IDC_EDIT_OUTPUT)->GetWindowRect(x);
+	//	ScreenToClient(&x);
+	//	int tr = 0;
+	//}
+
 	//if (nID == 1)
 	//	AfxMessageBox(_T("Number 0 has been pressed"));
 }

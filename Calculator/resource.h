@@ -22,6 +22,7 @@
 #define IDC_BUTTON_CLEAR                1014
 #define IDC_EDIT_OUTPUT                 1015
 #define IDC_EDIT_HISTORY                1016
+#define IDC_EDIT1                       1017
 #define IDC_BUTTON_DIVIDE               1019
 #define IDC_BUTTON_MULTIPLY             1020
 #define IDC_BUTTON_MINUS                1021
@@ -33,7 +34,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1017
+#define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
