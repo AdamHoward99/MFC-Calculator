@@ -46,12 +46,9 @@ private:
 	CString m_historyText;
 
 	CFont font;
-	//std::unordered_map<std::string, CButton> m_uiButtons;
 	std::vector<CButton*> m_uiButtons;
 	std::vector<CEdit*> m_textBoxes;
 
-	//CEdit historyBox;
-	//CEdit outputBox;
 
 	char m_lastInput;
 	bool m_decimalActive = false;
@@ -62,6 +59,9 @@ private:
 	void AddNumberToSum(const char);
 	CButton* CreateNewButton(const CString&, const CRect&, const int);
 	CEdit* CreateNewEditBox(const DWORD&, const CRect&, const int);
+	double CalculateTotal();
+	bool IsLastInputANumber();
+	void InitializeUIComponents();
 public:
 	afx_msg void OnButtonClick(UINT nID);
 };
