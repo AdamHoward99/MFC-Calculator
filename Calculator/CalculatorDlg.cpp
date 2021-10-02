@@ -58,6 +58,21 @@ CCalculatorDlg::CCalculatorDlg(CWnd* pParent /*=nullptr*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
+CCalculatorDlg::~CCalculatorDlg()
+{
+	for (CButton* btn : m_uiButtons)
+	{
+		delete btn;
+		btn = NULL;
+	}
+
+	for (CEdit* box : m_textBoxes)
+	{
+		delete box;
+		box = NULL;
+	}
+}
+
 void CCalculatorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
@@ -104,32 +119,39 @@ BOOL CCalculatorDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 	//Function to initialize all calculator buttons
-	num0.Create(_T("0"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 345, 112, 395), this, 10);
-	num1.Create(_T("1"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 271, 112, 325), this, 11);
-	num2.Create(_T("2"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 271, 194, 325), this, 12);
-	num3.Create(_T("3"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 271, 277, 325), this, 13);
-	num4.Create(_T("4"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 200, 112, 254), this, 14);
-	num5.Create(_T("5"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 200, 194, 254), this, 15);
-	num6.Create(_T("6"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 200, 277, 254), this, 16);
-	num7.Create(_T("7"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(50, 128, 112, 182), this, 17);
-	num8.Create(_T("8"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 128, 194, 182), this, 18);
-	num9.Create(_T("9"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 128, 277, 182), this, 19);
+	//Number buttons
+	m_uiButtons.push_back(CreateNewButton(_T("0"), CRect(50, 345, 112, 395), 10));
+	m_uiButtons.push_back(CreateNewButton(_T("1"), CRect(50, 271, 112, 325), 11));
+	m_uiButtons.push_back(CreateNewButton(_T("2"), CRect(132, 271, 194, 325), 12));
+	m_uiButtons.push_back(CreateNewButton(_T("3"), CRect(215, 271, 277, 325), 13));
+	m_uiButtons.push_back(CreateNewButton(_T("4"), CRect(50, 200, 112, 254), 14));
+	m_uiButtons.push_back(CreateNewButton(_T("5"), CRect(132, 200, 194, 254), 15));
+	m_uiButtons.push_back(CreateNewButton(_T("6"), CRect(215, 200, 277, 254), 16));
+	m_uiButtons.push_back(CreateNewButton(_T("7"), CRect(50, 128, 112, 182), 17));
+	m_uiButtons.push_back(CreateNewButton(_T("8"), CRect(132, 128, 194, 182), 18));
+	m_uiButtons.push_back(CreateNewButton(_T("9"), CRect(215, 128, 277, 182), 19));
 
-	decimalButton.Create(_T("."), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(132, 345, 194, 395), this, 20);
-	equalsButton.Create(_T("="), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(215, 345, 277, 395), this, 21);
-	addButton.Create(_T("+"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 354, 366, 395), this, 22);
-	minusButton.Create(_T("-"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 299, 366, 340), this, 23);
-	multiplyButton.Create(_T("x"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 242, 366, 283), this, 24);
-	divideButton.Create(_T("/"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 185, 366, 226), this, 25);
-	clearButton.Create(_T("C"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, CRect(294, 128, 366, 169), this, 26);
+	//Operation Buttons
+	m_uiButtons.push_back(CreateNewButton(_T("."), CRect(132, 345, 194, 395), 20));
+	m_uiButtons.push_back(CreateNewButton(_T("="), CRect(215, 345, 277, 395), 21));
+	m_uiButtons.push_back(CreateNewButton(_T("+"), CRect(294, 354, 366, 395), 22));
+	m_uiButtons.push_back(CreateNewButton(_T("-"), CRect(294, 299, 366, 340), 23));
+	m_uiButtons.push_back(CreateNewButton(_T("x"), CRect(294, 242, 366, 283), 24));
+	m_uiButtons.push_back(CreateNewButton(_T("/"), CRect(294, 185, 366, 226), 25));
+	m_uiButtons.push_back(CreateNewButton(_T("C"), CRect(294, 128, 366, 169), 26));
 
-	historyBox.Create(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOVSCROLL | ES_READONLY | ES_MULTILINE | WS_VSCROLL, CRect(11, 414, 421, 468), this, 27);
-	outputBox.Create(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), this, 28);
+	//Calculation History Edit Box
+	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOVSCROLL | ES_READONLY | ES_MULTILINE | WS_VSCROLL,
+		CRect(11, 414, 421, 468), 27));		
+
+	//Output Edit Box
+	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 28));
 
 	font.CreateFontA(32, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
 		0, 0, 0, 0, _T("Digital-7"));
 
-	outputBox.SetFont(&font);
+	m_textBoxes[1]->SetFont(&font);
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -186,12 +208,13 @@ void CCalculatorDlg::AddCharToOutput(const char txt)
 {
 	m_outputText += txt;
 	m_lastInput = txt;
-	outputBox.SetWindowTextA(m_outputText.c_str());
+	m_textBoxes[1]->SetWindowTextA(m_outputText.c_str());
 	UpdateData(FALSE);		//FALSE updates window based on new variable value, true takes window value and assigns it to variable
 }
 
 void CCalculatorDlg::AddNumberToSum(const char op)
 {
+	m_decimalActive = false;
 	size_t start, size = 0;
 
 	start = m_outputText.size();
@@ -220,8 +243,11 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 	switch (nID)
 	{
 	case 20:		//Decimal Point
-		if(m_outputText.length() > 0 && m_outputText.find('.') == -1)		//number has to be present, only 1 decimal point allowed
+		if (m_lastInput > 47 && m_lastInput < 58 && !m_decimalActive)		//number has to be present, only 1 decimal point allowed
+		{
+			m_decimalActive = true;
 			AddCharToOutput('.');
+		}
 		break;
 
 	case 21:		//Equals
@@ -264,12 +290,11 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 					break;
 				}
 			}
-
 			m_outputText.clear();
-			outputBox.SetWindowTextA(m_outputText.c_str());
+			//outputBox.SetWindowTextA(m_outputText.c_str());
 			UpdateData(FALSE);
 
-			outputBox.SetWindowTextA(std::to_string(total).c_str());
+			m_textBoxes[1]->SetWindowTextA(std::to_string(total).c_str());
 
 		}
 
@@ -285,7 +310,7 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		break;
 
 	case 23:	//Subtract
-		if (m_lastInput > 47 && m_lastInput < 58)		//TODO IMPROVE
+		if (m_lastInput > 47 && m_lastInput < 58 && m_outputText.length() > 0)		//TODO IMPROVE
 		{
 			AddNumberToSum('-');
 			AddCharToOutput('-');
@@ -311,7 +336,8 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 
 	case 26:		//Clear
 		m_outputText.clear();
-		outputBox.SetWindowTextA(m_outputText.c_str());
+		m_textBoxes[1]->SetWindowTextA(m_outputText.c_str());
+		UpdateData(FALSE);
 		break;
 	}
 	//else
@@ -324,4 +350,22 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 
 	//if (nID == 1)
 	//	AfxMessageBox(_T("Number 0 has been pressed"));
+}
+
+CButton* CCalculatorDlg::CreateNewButton(const CString& btnName, const CRect& pos, const int ID)
+{
+	CButton* btn = new CButton;
+	if (btn->Create(btnName, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, pos, this, ID))
+		return btn;
+	else
+		assert("CreateNewButton() : Button not created");
+}
+
+CEdit* CCalculatorDlg::CreateNewEditBox(const DWORD& styles, const CRect& pos, const int ID)
+{
+	CEdit* box = new CEdit;
+	if (box->Create(styles, pos, this, ID))
+		return box;
+	else
+		assert("CreateNewEditBox() : CEdit not created");
 }

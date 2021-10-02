@@ -20,6 +20,7 @@ class CCalculatorDlg : public CDialogEx
 // Construction
 public:
 	CCalculatorDlg(CWnd* pParent = nullptr);	// standard constructor
+	~CCalculatorDlg();
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -46,35 +47,21 @@ private:
 
 	CFont font;
 	//std::unordered_map<std::string, CButton> m_uiButtons;
-	std::vector<CButton> m_uiButtons;
-	CButton num0;
-	CButton num1;
-	CButton num2;
-	CButton num3;
-	CButton num4;
-	CButton num5;
-	CButton num6;
-	CButton num7;
-	CButton num8;
-	CButton num9;
-	CButton clearButton;
-	CButton decimalButton;
-	CButton divideButton;
-	CButton equalsButton;
-	CButton minusButton;
-	CButton multiplyButton;
-	CButton addButton;
+	std::vector<CButton*> m_uiButtons;
+	std::vector<CEdit*> m_textBoxes;
 
-	CEdit historyBox;
-	CEdit outputBox;
+	//CEdit historyBox;
+	//CEdit outputBox;
 
 	char m_lastInput;
+	bool m_decimalActive = false;
 
 	std::vector<Operation> m_sum;
 
 	void AddCharToOutput(const char);
 	void AddNumberToSum(const char);
-
+	CButton* CreateNewButton(const CString&, const CRect&, const int);
+	CEdit* CreateNewEditBox(const DWORD&, const CRect&, const int);
 public:
 	afx_msg void OnButtonClick(UINT nID);
 };
