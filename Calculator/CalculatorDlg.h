@@ -43,7 +43,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	std::string m_outputText;
-	CString m_historyText;
+	std::string m_historyText;
 
 	CFont font;
 	std::vector<CButton*> m_uiButtons;

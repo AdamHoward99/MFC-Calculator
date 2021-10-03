@@ -230,9 +230,12 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 
 	case 21:		//Equals
 		AddNumberToSum('=');
+		m_historyText += m_outputText;		//Adds sum to history
 		m_outputText.clear();
 		m_lastInput = NULL;
-		m_textBoxes[1]->SetWindowTextA(std::to_string(CalculateTotal()).c_str());
+
+		m_textBoxes[1]->SetWindowTextA(std::to_string(CalculateTotal()).c_str());		//Output total value of sum to output box
+		m_textBoxes[0]->SetWindowTextA(m_historyText.c_str());
 		UpdateData(FALSE);
 		break;
 
@@ -311,6 +314,9 @@ double CCalculatorDlg::CalculateTotal()
 			break;
 		}
 	}
+
+	//Update Text based on total
+	m_historyText += std::to_string(total) + "\r\n";
 
 	return total;
 }
