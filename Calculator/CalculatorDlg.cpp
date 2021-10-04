@@ -61,16 +61,13 @@ CCalculatorDlg::CCalculatorDlg(CWnd* pParent /*=nullptr*/)
 CCalculatorDlg::~CCalculatorDlg()
 {
 	for (CButton* btn : m_uiButtons)
-	{
-		delete btn;
-		btn = NULL;
-	}
+	{	delete btn;	btn = NULL;	}
 
 	for (CEdit* box : m_textBoxes)
-	{
-		delete box;
-		box = NULL;
-	}
+	{	delete box;	box = NULL;	}
+
+	for(CFont* f : m_fonts)
+	{	delete f; f = NULL;	}
 }
 
 void CCalculatorDlg::DoDataExchange(CDataExchange* pDX)
@@ -119,11 +116,13 @@ BOOL CCalculatorDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 	InitializeUIComponents();
+	InitializeFonts();
 
-	font.CreateFontA(32, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
-		0, 0, 0, 0, _T("Digital-7"));
 
-	m_textBoxes[1]->SetFont(&font);
+	for (CButton* btn : m_uiButtons)
+		btn->SetFont(m_fonts[0]);
+
+	m_textBoxes[1]->SetFont(m_fonts[1]);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -269,8 +268,9 @@ CButton* CCalculatorDlg::CreateNewButton(const CString& btnName, const CRect& po
 	CButton* btn = new CButton;
 	if (btn->Create(btnName, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, pos, this, ID))
 		return btn;
-	else
-		assert("CreateNewButton() : Button not created");
+
+	assert("CreateNewButton() : Button not created");
+	return nullptr;
 }
 
 CEdit* CCalculatorDlg::CreateNewEditBox(const DWORD& styles, const CRect& pos, const int ID)
@@ -278,8 +278,9 @@ CEdit* CCalculatorDlg::CreateNewEditBox(const DWORD& styles, const CRect& pos, c
 	CEdit* box = new CEdit;
 	if (box->Create(styles, pos, this, ID))
 		return box;
-	else
-		assert("CreateNewEditBox() : CEdit not created");
+		
+	assert("CreateNewEditBox() : CEdit not created");
+	return nullptr;
 }
 
 double CCalculatorDlg::CalculateTotal()
@@ -359,4 +360,18 @@ void CCalculatorDlg::InitializeUIComponents()
 
 	//Output Edit Box
 	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 28));
+}
+
+void CCalculatorDlg::InitializeFonts()
+{
+	CFont* buttonFont = new CFont;
+	buttonFont->CreateFontA(26, 0, 0, 0, FW_DONTCARE, 0, 0, 0, DEFAULT_CHARSET,
+		0, 0, 0, 0, _T("Calibri"));
+
+	CFont* outputFont = new CFont;
+	outputFont->CreateFontA(32, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
+		0, 0, 0, 0, _T("MS Sans"));
+
+	m_fonts.push_back(buttonFont);
+	m_fonts.push_back(outputFont);
 }

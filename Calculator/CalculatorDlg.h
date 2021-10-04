@@ -39,29 +39,30 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
+	afx_msg void OnButtonClick(UINT nID);
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 private:
-	std::string m_outputText;
-	std::string m_historyText;
+	void InitializeUIComponents();
+	void InitializeFonts();
 
-	CFont font;
-	std::vector<CButton*> m_uiButtons;
-	std::vector<CEdit*> m_textBoxes;
-
-
-	char m_lastInput;
-	bool m_decimalActive = false;
-
-	std::vector<Operation> m_sum;
+	CButton* CreateNewButton(const CString&, const CRect&, const int);
+	CEdit* CreateNewEditBox(const DWORD&, const CRect&, const int);
 
 	void AddCharToOutput(const char);
 	void AddNumberToSum(const char);
-	CButton* CreateNewButton(const CString&, const CRect&, const int);
-	CEdit* CreateNewEditBox(const DWORD&, const CRect&, const int);
-	double CalculateTotal();
 	bool IsLastInputANumber();
-	void InitializeUIComponents();
-public:
-	afx_msg void OnButtonClick(UINT nID);
+	double CalculateTotal();
+	
+	
+	bool m_decimalActive = false;
+	char m_lastInput;
+
+	std::string m_outputText;
+	std::string m_historyText;
+
+	std::vector<Operation> m_sum;
+	std::vector<CButton*> m_uiButtons;
+	std::vector<CEdit*> m_textBoxes;
+	std::vector<CFont*> m_fonts;
 };
