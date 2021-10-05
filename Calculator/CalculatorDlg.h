@@ -1,9 +1,5 @@
-
-// CalculatorDlg.h : header file
-//
-
 #pragma once
-#include <unordered_map>
+#include "framework.h"
 #include <string>
 #include <vector>
 
@@ -13,28 +9,16 @@ struct Operation
 	const char operation;
 };
 
-
 // CCalculatorDlg dialog
 class CCalculatorDlg : public CDialogEx
 {
-// Construction
 public:
 	CCalculatorDlg(CWnd* pParent = nullptr);	// standard constructor
 	~CCalculatorDlg();
 
-// Dialog Data
-#ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_CALCULATOR_DIALOG };
-#endif
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
-
-
 // Implementation
 protected:
 	HICON m_hIcon;
-
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
@@ -51,15 +35,17 @@ private:
 
 	void AddCharToOutput(const char);
 	void AddNumberToSum(const char);
+	void SetFonts();
 	bool IsLastInputANumber();
-	double CalculateTotal();
+	void CalculateTotal();
 	
 	
 	bool m_decimalActive = false;
 	char m_lastInput;
 
-	std::string m_outputText;
-	std::string m_historyText;
+	std::string m_outputText = "";
+	std::string m_historyText = "";
+	std::string m_totalText = "";
 
 	std::vector<Operation> m_sum;
 	std::vector<CButton*> m_uiButtons;

@@ -1,59 +1,8 @@
-
-// CalculatorDlg.cpp : implementation file
-//
-
-#include "pch.h"
-#include "framework.h"
 #include "Calculator.h"
 #include "CalculatorDlg.h"
-#include "afxdialogex.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-
-// CAboutDlg dialog used for App About
-
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg();
-
-// Dialog Data
-#ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ABOUTBOX };
-#endif
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-END_MESSAGE_MAP()
-
-
-// CCalculatorDlg dialog
-
-
 
 CCalculatorDlg::CCalculatorDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_CALCULATOR_DIALOG, pParent)
-	, m_outputText(_T(""))
-	, m_historyText(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -70,15 +19,10 @@ CCalculatorDlg::~CCalculatorDlg()
 	{	delete f; f = NULL;	}
 }
 
-void CCalculatorDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
 BEGIN_MESSAGE_MAP(CCalculatorDlg, CDialogEx)
-	ON_WM_SYSCOMMAND()
-	ON_WM_PAINT()
-	ON_WM_QUERYDRAGICON()
+	//ON_WM_SYSCOMMAND()
+	//ON_WM_PAINT()
+	//ON_WM_QUERYDRAGICON()
 	ON_CONTROL_RANGE(BN_CLICKED, 10, 26, &CCalculatorDlg::OnButtonClick)
 END_MESSAGE_MAP()
 
@@ -88,56 +32,23 @@ END_MESSAGE_MAP()
 BOOL CCalculatorDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
-	// Add "About..." menu item to system menu.
-
-	// IDM_ABOUTBOX must be in the system command range.
-	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ASSERT(IDM_ABOUTBOX < 0xF000);
-
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != nullptr)
-	{
-		BOOL bNameValid;
-		CString strAboutMenu;
-		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ASSERT(bNameValid);
-		if (!strAboutMenu.IsEmpty())
-		{
-			pSysMenu->AppendMenu(MF_SEPARATOR);
-			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
-		}
-	}
-
+	
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	// TODO: Add extra initialization here
 	InitializeUIComponents();
 	InitializeFonts();
-
-
-	for (CButton* btn : m_uiButtons)
-		btn->SetFont(m_fonts[0]);
-
-	m_textBoxes[1]->SetFont(m_fonts[1]);
-
+	SetFonts();
+	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
 void CCalculatorDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
-	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
-	}
-	else
-	{
-		CDialogEx::OnSysCommand(nID, lParam);
-	}
+	CDialogEx::OnSysCommand(nID, lParam);
 }
 
 // If you add a minimize button to your dialog, you will need the code below
@@ -199,8 +110,6 @@ void CCalculatorDlg::AddNumberToSum(const char op)
 		c--;
 	} while (start >= 0 && (*c > 47 && *c < 58) || *c == '.');
 
-	std::string te = m_outputText.substr(start, size);
-
 	m_sum.push_back({ std::stod(m_outputText.substr(start, size)), *c });
 	AddCharToOutput(op);
 }
@@ -233,9 +142,14 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		m_outputText.clear();
 		m_lastInput = NULL;
 
-		m_textBoxes[1]->SetWindowTextA(std::to_string(CalculateTotal()).c_str());		//Output total value of sum to output box
+		CalculateTotal();
+
+		//Update Text based on total
+		m_historyText += m_totalText + "\r\n";
 		m_textBoxes[0]->SetWindowTextA(m_historyText.c_str());
+		m_textBoxes[1]->SetWindowTextA(m_totalText.c_str());		//Output total value of sum to output box
 		UpdateData(FALSE);
+		m_totalText.clear();
 		break;
 
 	case 22:		//Add
@@ -283,7 +197,7 @@ CEdit* CCalculatorDlg::CreateNewEditBox(const DWORD& styles, const CRect& pos, c
 	return nullptr;
 }
 
-double CCalculatorDlg::CalculateTotal()
+void CCalculatorDlg::CalculateTotal()
 {
 	double total = 0.0f;
 
@@ -316,10 +230,10 @@ double CCalculatorDlg::CalculateTotal()
 		}
 	}
 
-	//Update Text based on total
-	m_historyText += std::to_string(total) + "\r\n";
-
-	return total;
+	//Removes trailing 0's from string equivalent of total
+	m_totalText = std::to_string(total);
+	m_totalText.erase(m_totalText.find_last_not_of('0') + 1, std::string::npos);
+	m_totalText.erase(m_totalText.find_last_not_of('.') + 1, std::string::npos);
 }
 
 bool CCalculatorDlg::IsLastInputANumber()
@@ -374,4 +288,12 @@ void CCalculatorDlg::InitializeFonts()
 
 	m_fonts.push_back(buttonFont);
 	m_fonts.push_back(outputFont);
+}
+
+void CCalculatorDlg::SetFonts()
+{
+	for (CButton* btn : m_uiButtons)
+		btn->SetFont(m_fonts[0]);
+
+	m_textBoxes[1]->SetFont(m_fonts[1]);
 }
