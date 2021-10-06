@@ -1,7 +1,7 @@
 #include "Calculator.h"
 #include "CalculatorDlg.h"
 
-CCalculatorDlg::CCalculatorDlg(CWnd* pParent /*=nullptr*/)
+CCalculatorDlg::CCalculatorDlg(CWnd* pParent)
 	: CDialogEx(IDD_CALCULATOR_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -20,9 +20,6 @@ CCalculatorDlg::~CCalculatorDlg()
 }
 
 BEGIN_MESSAGE_MAP(CCalculatorDlg, CDialogEx)
-	//ON_WM_SYSCOMMAND()
-	//ON_WM_PAINT()
-	//ON_WM_QUERYDRAGICON()
 	ON_CONTROL_RANGE(BN_CLICKED, 10, 26, &CCalculatorDlg::OnButtonClick)
 END_MESSAGE_MAP()
 
@@ -42,42 +39,13 @@ BOOL CCalculatorDlg::OnInitDialog()
 	InitializeUIComponents();
 	InitializeFonts();
 	SetFonts();
-	
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
 void CCalculatorDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	CDialogEx::OnSysCommand(nID, lParam);
-}
-
-// If you add a minimize button to your dialog, you will need the code below
-//  to draw the icon.  For MFC applications using the document/view model,
-//  this is automatically done for you by the framework.
-
-void CCalculatorDlg::OnPaint()
-{
-	if (IsIconic())
-	{
-		CPaintDC dc(this); // device context for painting
-
-		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
-
-		// Center icon in client rectangle
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
-
-		// Draw the icon
-		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
-		CDialogEx::OnPaint();
-	}
 }
 
 // The system calls this function to obtain the cursor to display while the user drags
@@ -183,7 +151,6 @@ CButton* CCalculatorDlg::CreateNewButton(const CString& btnName, const CRect& po
 	if (btn->Create(btnName, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | WS_TABSTOP, pos, this, ID))
 		return btn;
 
-	assert("CreateNewButton() : Button not created");
 	return nullptr;
 }
 
@@ -193,7 +160,6 @@ CEdit* CCalculatorDlg::CreateNewEditBox(const DWORD& styles, const CRect& pos, c
 	if (box->Create(styles, pos, this, ID))
 		return box;
 		
-	assert("CreateNewEditBox() : CEdit not created");
 	return nullptr;
 }
 
