@@ -33,6 +33,19 @@ BOOL CCalculatorApp::InitInstance()
 
 	SetRegistryKey(_T("Adam Howard"));
 
+	//Function?
+	//CCalculatorDlg* newD = new CCalculatorDlg();
+	//newD->Create(102, nullptr);
+	//calculator = newD;
+
+
+	//m_pMainWnd = *&calculator;
+	//INT_PTR nResponse = calculator->DoModal();
+
+
+	//delete newD;
+	//newD = NULL;
+
 	CCalculatorDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();

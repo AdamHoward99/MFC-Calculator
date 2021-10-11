@@ -1,16 +1,19 @@
 #pragma once
-#include "framework.h"
 #include <string>
 #include <vector>
+
+#define DIALOG_ID 102
+#define MAINFRAME_ID 128
+
 
 struct Operation
 {
 	const double number;
-	const char operation;
+	const wchar_t operation;
 };
 
 // CCalculatorDlg dialog
-class CCalculatorDlg : public CDialogEx
+class CCalculatorDlg : public CDialog
 {
 public:
 	CCalculatorDlg(CWnd* pParent = nullptr);	// standard constructor
@@ -32,19 +35,19 @@ private:
 	CButton* CreateNewButton(const CString&, const CRect&, const int);
 	CEdit* CreateNewEditBox(const DWORD&, const CRect&, const int);
 
-	void AddCharToOutput(const char);
-	void AddNumberToSum(const char);
+	void AddCharToOutput(const wchar_t);
+	void AddNumberToSum(const wchar_t);
 	void SetFonts();
 	bool IsLastInputANumber();
 	void CalculateTotal();
 	
 	
 	bool m_decimalActive = false;
-	char m_lastInput;
+	wchar_t m_lastInput;
 
-	std::string m_outputText = "";
-	std::string m_historyText = "";
-	std::string m_totalText = "";
+	std::wstring m_outputText = L"";
+	std::wstring m_historyText = L"";
+	std::wstring m_totalText = L"";
 
 	std::vector<Operation> m_sum;
 	std::vector<CButton*> m_uiButtons;

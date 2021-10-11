@@ -1,10 +1,10 @@
-#include "Calculator.h"
+﻿#include "Calculator.h"
 #include "CalculatorDlg.h"
 
-CCalculatorDlg::CCalculatorDlg(CWnd* pParent)
-	: CDialogEx(IDD_CALCULATOR_DIALOG, pParent)
+CCalculatorDlg::CCalculatorDlg(CWnd* pParent) 
+	: CDialog(DIALOG_ID, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon = AfxGetApp()->LoadIcon(MAINFRAME_ID);
 }
 
 CCalculatorDlg::~CCalculatorDlg()
@@ -19,8 +19,8 @@ CCalculatorDlg::~CCalculatorDlg()
 	{	delete f; f = NULL;	}
 }
 
-BEGIN_MESSAGE_MAP(CCalculatorDlg, CDialogEx)
-	ON_CONTROL_RANGE(BN_CLICKED, 10, 26, &CCalculatorDlg::OnButtonClick)
+BEGIN_MESSAGE_MAP(CCalculatorDlg, CDialog)
+	ON_CONTROL_RANGE(BN_CLICKED, 10, 27, &CCalculatorDlg::OnButtonClick)
 END_MESSAGE_MAP()
 
 
@@ -28,7 +28,7 @@ END_MESSAGE_MAP()
 
 BOOL CCalculatorDlg::OnInitDialog()
 {
-	CDialogEx::OnInitDialog();
+	CDialog::OnInitDialog();
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	
 	// Set the icon for this dialog.  The framework does this automatically
@@ -45,7 +45,7 @@ BOOL CCalculatorDlg::OnInitDialog()
 
 void CCalculatorDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	CDialogEx::OnSysCommand(nID, lParam);
+	CDialog::OnSysCommand(nID, lParam);
 }
 
 // The system calls this function to obtain the cursor to display while the user drags
@@ -55,28 +55,28 @@ HCURSOR CCalculatorDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CCalculatorDlg::AddCharToOutput(const char txt)
+void CCalculatorDlg::AddCharToOutput(const wchar_t txt)
 {
 	m_outputText += txt;
 	m_lastInput = txt;
-	m_textBoxes[1]->SetWindowTextA(m_outputText.c_str());
+	m_textBoxes[1]->SetWindowTextW(m_outputText.c_str());
 	UpdateData(FALSE);		//FALSE updates window based on new variable value, true takes window value and assigns it to variable
 }
 
-void CCalculatorDlg::AddNumberToSum(const char op)
+void CCalculatorDlg::AddNumberToSum(const wchar_t op)
 {
 	m_decimalActive = false;
 	size_t start, size = 0;
 
 	start = m_outputText.size();
-	char* c = &m_outputText[m_outputText.size() - 1];
+	wchar_t* c = &m_outputText[m_outputText.size() - 1];
 
 	do
 	{
 		start--;
 		size++;
 		c--;
-	} while (start >= 0 && (*c > 47 && *c < 58) || *c == '.');
+	} while (start > 0 && (*c >= L'0' && *c <= L'9') || *c == L'.');
 
 	m_sum.push_back({ std::stod(m_outputText.substr(start, size)), *c });
 	AddCharToOutput(op);
@@ -86,7 +86,7 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 {
 	if (nID < 20)		//10-19 is number buttons, put this in a bool check function maybe
 	{
-		AddCharToOutput('0' + (nID - 10));
+		AddCharToOutput(L'0' + (nID - 10));
 		return;
 	}
 
@@ -100,12 +100,12 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		if (!m_decimalActive)		//number has to be present, only 1 decimal point allowed
 		{
 			m_decimalActive = true;
-			AddCharToOutput('.');
+			AddCharToOutput(L'.');
 		}
 		break;
 
 	case 21:		//Equals
-		AddNumberToSum('=');
+		AddNumberToSum(L'=');
 		m_historyText += m_outputText;		//Adds sum to history
 		m_outputText.clear();
 		m_lastInput = NULL;
@@ -113,34 +113,38 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		CalculateTotal();
 
 		//Update Text based on total
-		m_historyText += m_totalText + "\r\n";
-		m_textBoxes[0]->SetWindowTextA(m_historyText.c_str());
-		m_textBoxes[1]->SetWindowTextA(m_totalText.c_str());		//Output total value of sum to output box
+		m_historyText += m_totalText + L"\r\n";
+		m_textBoxes[0]->SetWindowTextW(m_historyText.c_str());
+		m_textBoxes[1]->SetWindowTextW(m_totalText.c_str());		//Output total value of sum to output box
 		UpdateData(FALSE);
 		m_totalText.clear();
 		break;
 
 	case 22:		//Add
-		AddNumberToSum('+');		//Adds number before operation to sum vector
+		AddNumberToSum(L'+');		//Adds number before operation to sum vector
 		break;
 
 	case 23:	//Subtract
-		AddNumberToSum('-');
+		AddNumberToSum(L'-');
 		break;
 
 	case 24:	//Multiply
-		AddNumberToSum('x');
+		AddNumberToSum(L'x');
 		break;
 
 	case 25:	//Divide
-		AddNumberToSum('/');
+		AddNumberToSum(L'/');
 		break;
 
 	case 26:		//Clear
 		m_outputText.clear();
 		m_lastInput = NULL;
-		m_textBoxes[1]->SetWindowTextA(m_outputText.c_str());
+		m_textBoxes[1]->SetWindowTextW(m_outputText.c_str());
 		UpdateData(FALSE);
+		break;
+
+	case 27:		//Square Root
+		//TODO: functionality for square root goes here
 		break;
 	}
 }
@@ -171,23 +175,23 @@ void CCalculatorDlg::CalculateTotal()
 	{
 		switch (var.operation)
 		{
-		case '-':
+		case L'-':
 			total -= var.number;
 			break;
 
-		case '+':
+		case L'+':
 			total += var.number;
 			break;
 
-		case 'x':
+		case L'x':
 			total *= var.number;
 			break;
 
-		case '/':
+		case L'/':
 			total /= var.number;
 			break;
 
-		case '=':
+		case L'=':
 			break;
 
 		default:
@@ -197,9 +201,9 @@ void CCalculatorDlg::CalculateTotal()
 	}
 
 	//Removes trailing 0's from string equivalent of total
-	m_totalText = std::to_string(total);
-	m_totalText.erase(m_totalText.find_last_not_of('0') + 1, std::string::npos);
-	m_totalText.erase(m_totalText.find_last_not_of('.') + 1, std::string::npos);
+	m_totalText = std::to_wstring(total);
+	m_totalText.erase(m_totalText.find_last_not_of(L'0') + 1, std::string::npos);
+	m_totalText.erase(m_totalText.find_last_not_of(L'.') + 1, std::string::npos);
 }
 
 bool CCalculatorDlg::IsLastInputANumber()
@@ -211,45 +215,46 @@ void CCalculatorDlg::InitializeUIComponents()
 {
 	//Number buttons
 	{
-		m_uiButtons.push_back(CreateNewButton(_T("0"), CRect(50, 345, 112, 395), 10));
-		m_uiButtons.push_back(CreateNewButton(_T("1"), CRect(50, 271, 112, 325), 11));
-		m_uiButtons.push_back(CreateNewButton(_T("2"), CRect(132, 271, 194, 325), 12));
-		m_uiButtons.push_back(CreateNewButton(_T("3"), CRect(215, 271, 277, 325), 13));
-		m_uiButtons.push_back(CreateNewButton(_T("4"), CRect(50, 200, 112, 254), 14));
-		m_uiButtons.push_back(CreateNewButton(_T("5"), CRect(132, 200, 194, 254), 15));
-		m_uiButtons.push_back(CreateNewButton(_T("6"), CRect(215, 200, 277, 254), 16));
-		m_uiButtons.push_back(CreateNewButton(_T("7"), CRect(50, 128, 112, 182), 17));
-		m_uiButtons.push_back(CreateNewButton(_T("8"), CRect(132, 128, 194, 182), 18));
-		m_uiButtons.push_back(CreateNewButton(_T("9"), CRect(215, 128, 277, 182), 19));
+		m_uiButtons.push_back(CreateNewButton(_T("0"), CRect(25, 345, 87, 395), 10));
+		m_uiButtons.push_back(CreateNewButton(_T("1"), CRect(25, 271, 87, 325), 11));
+		m_uiButtons.push_back(CreateNewButton(_T("2"), CRect(107, 271, 169, 325), 12));
+		m_uiButtons.push_back(CreateNewButton(_T("3"), CRect(190, 271, 252, 325), 13));
+		m_uiButtons.push_back(CreateNewButton(_T("4"), CRect(25, 200, 87, 254), 14));
+		m_uiButtons.push_back(CreateNewButton(_T("5"), CRect(107, 200, 169, 254), 15));
+		m_uiButtons.push_back(CreateNewButton(_T("6"), CRect(190, 200, 252, 254), 16));
+		m_uiButtons.push_back(CreateNewButton(_T("7"), CRect(25, 128, 87, 182), 17));
+		m_uiButtons.push_back(CreateNewButton(_T("8"), CRect(107, 128, 169, 182), 18));
+		m_uiButtons.push_back(CreateNewButton(_T("9"), CRect(190, 128, 252, 182), 19));
 	}
 
 	//Operation Buttons
 	{
-		m_uiButtons.push_back(CreateNewButton(_T("."), CRect(132, 345, 194, 395), 20));
-		m_uiButtons.push_back(CreateNewButton(_T("="), CRect(215, 345, 277, 395), 21));
-		m_uiButtons.push_back(CreateNewButton(_T("+"), CRect(294, 354, 366, 395), 22));
-		m_uiButtons.push_back(CreateNewButton(_T("-"), CRect(294, 299, 366, 340), 23));
-		m_uiButtons.push_back(CreateNewButton(_T("x"), CRect(294, 242, 366, 283), 24));
-		m_uiButtons.push_back(CreateNewButton(_T("/"), CRect(294, 185, 366, 226), 25));
-		m_uiButtons.push_back(CreateNewButton(_T("C"), CRect(294, 128, 366, 169), 26));
+		m_uiButtons.push_back(CreateNewButton(_T("."), CRect(107, 345, 169, 395), 20));
+		m_uiButtons.push_back(CreateNewButton(_T("="), CRect(190, 345, 252, 395), 21));
+		m_uiButtons.push_back(CreateNewButton(_T("+"), CRect(269, 354, 341, 395), 22));
+		m_uiButtons.push_back(CreateNewButton(_T("-"), CRect(269, 299, 341, 340), 23));
+		m_uiButtons.push_back(CreateNewButton(_T("x"), CRect(269, 242, 341, 283), 24));
+		m_uiButtons.push_back(CreateNewButton(_T("/"), CRect(269, 185, 341, 226), 25));
+		m_uiButtons.push_back(CreateNewButton(_T("C"), CRect(269, 128, 341, 169), 26));
+		m_uiButtons.push_back(CreateNewButton(_T("√"), CRect(350, 128, 422, 169), 27));
 	}
 
 	//Calculation History Edit Box
 	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOVSCROLL | ES_READONLY | ES_MULTILINE | WS_VSCROLL,
-		CRect(11, 414, 421, 468), 27));
+		CRect(11, 414, 421, 468), 28));
 
 	//Output Edit Box
-	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 28));
+	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 29));
 }
 
 void CCalculatorDlg::InitializeFonts()
 {
 	CFont* buttonFont = new CFont;
-	buttonFont->CreateFontA(26, 0, 0, 0, FW_DONTCARE, 0, 0, 0, DEFAULT_CHARSET,
+	buttonFont->CreateFontW(26, 0, 0, 0, FW_DONTCARE, 0, 0, 0, DEFAULT_CHARSET,
 		0, 0, 0, 0, _T("Calibri"));
 
 	CFont* outputFont = new CFont;
-	outputFont->CreateFontA(32, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
+	outputFont->CreateFontW(32, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
 		0, 0, 0, 0, _T("MS Sans"));
 
 	m_fonts.push_back(buttonFont);
