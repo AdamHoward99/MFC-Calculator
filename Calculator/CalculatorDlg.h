@@ -39,6 +39,7 @@ private:
 	void AddNumberToSum(const wchar_t);
 	void SetFonts();
 	bool IsLastInputANumber();
+	bool IsLastInputAnOperation();
 	void CalculateTotal();
 	
 	

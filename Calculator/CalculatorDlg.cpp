@@ -90,7 +90,7 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		return;
 	}
 
-	if (!(nID == 26 || IsLastInputANumber()))		//Quits the application earlier when no change will be made
+	if (!(nID == 26 || nID == 27 || IsLastInputANumber()))		//Quits the application earlier when no change will be made
 		return;
 
 	//Operations
@@ -144,7 +144,8 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		break;
 
 	case 27:		//Square Root
-		//TODO: functionality for square root goes here
+		if (IsLastInputAnOperation() || m_lastInput == NULL)
+			AddCharToOutput(L'√');
 		break;
 	}
 }
@@ -191,6 +192,10 @@ void CCalculatorDlg::CalculateTotal()
 			total /= var.number;
 			break;
 
+		case L'√':
+			total += sqrt(var.number);
+			break;
+
 		case L'=':
 			break;
 
@@ -209,6 +214,11 @@ void CCalculatorDlg::CalculateTotal()
 bool CCalculatorDlg::IsLastInputANumber()
 {
 	return m_lastInput > 47 && m_lastInput < 58;
+}
+
+bool CCalculatorDlg::IsLastInputAnOperation()
+{
+	return m_lastInput == L'+' || m_lastInput == L'-' || m_lastInput == L'x' || m_lastInput == L'/';
 }
 
 void CCalculatorDlg::InitializeUIComponents()
