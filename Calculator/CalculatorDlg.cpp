@@ -20,7 +20,7 @@ CCalculatorDlg::~CCalculatorDlg()
 }
 
 BEGIN_MESSAGE_MAP(CCalculatorDlg, CDialog)
-	ON_CONTROL_RANGE(BN_CLICKED, 10, 27, &CCalculatorDlg::OnButtonClick)
+	ON_CONTROL_RANGE(BN_CLICKED, 10, 28, &CCalculatorDlg::OnButtonClick)
 END_MESSAGE_MAP()
 
 
@@ -63,23 +63,48 @@ void CCalculatorDlg::AddCharToOutput(const wchar_t txt)
 	UpdateData(FALSE);		//FALSE updates window based on new variable value, true takes window value and assigns it to variable
 }
 
+void CCalculatorDlg::AddStringToOutput(const std::wstring& str)
+{
+	m_outputText += str;
+	m_lastInput = str[0];
+	m_textBoxes[1]->SetWindowTextW(m_outputText.c_str());
+	UpdateData(FALSE);
+}
+
 void CCalculatorDlg::AddNumberToSum(const wchar_t op)
 {
 	m_decimalActive = false;
-	size_t start, size = 0;
 
-	start = m_outputText.size();
 	wchar_t* c = &m_outputText[m_outputText.size() - 1];
+	double num = FindNumberString(m_outputText.size(), c);
+
+	//Last operation was a trigonometric operation (sin, cos, tan)
+	if (IsLastOperationTrigonometric(c))
+	{
+		c -= 4;
+		m_sum.push_back({ num, *c, m_lastPrecedingNumber });
+		m_lastPrecedingNumber = 1.0;
+		AddCharToOutput(L')');
+		AddCharToOutput(op);
+		return;
+	}
+
+	m_sum.push_back({ num, *c });
+	AddCharToOutput(op);
+}
+
+double CCalculatorDlg::FindNumberString(size_t start, wchar_t*& op)
+{
+	size_t size = 0;
 
 	do
 	{
 		start--;
 		size++;
-		c--;
-	} while (start > 0 && (*c >= L'0' && *c <= L'9') || *c == L'.');
+		op--;
+	} while (start > 0 && (*op >= L'0' && *op <= L'9') || *op == L'.');
 
-	m_sum.push_back({ std::stod(m_outputText.substr(start, size)), *c });
-	AddCharToOutput(op);
+	return std::stod(m_outputText.substr(start, size));
 }
 
 void CCalculatorDlg::OnButtonClick(UINT nID)
@@ -90,7 +115,7 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		return;
 	}
 
-	if (!(nID == 26 || nID == 27 || IsLastInputANumber()))		//Quits the application earlier when no change will be made
+	if (!(nID == 26 || nID == 27 || nID == 28 || IsLastInputANumber()))		//Quits the application earlier when no change will be made
 		return;
 
 	//Operations
@@ -118,6 +143,7 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		m_textBoxes[1]->SetWindowTextW(m_totalText.c_str());		//Output total value of sum to output box
 		UpdateData(FALSE);
 		m_totalText.clear();
+		m_sum.clear();
 		break;
 
 	case 22:		//Add
@@ -146,6 +172,18 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 	case 27:		//Square Root
 		if (IsLastInputAnOperation() || m_lastInput == NULL)
 			AddCharToOutput(L'√');
+		break;
+
+	case 28:		//sine
+		if (m_lastInput == NULL || IsLastInputAnOperation())		//Nothing or an operation in front of sine
+			AddStringToOutput(L"sinθ(");
+
+		//Numbers before the trig operation
+		if (IsLastInputANumber())
+		{
+			AddStringToOutput(L"sinθ(");
+			m_lastPrecedingNumber = FindNumberString(m_outputText.find_first_of(L's'));
+		}
 		break;
 	}
 }
@@ -194,6 +232,10 @@ void CCalculatorDlg::CalculateTotal()
 
 		case L'√':
 			total += sqrt(var.number);
+			break;
+
+		case L's':
+			total +=  var.precedingNumber * sin(var.number);
 			break;
 
 		case L'=':
@@ -247,14 +289,15 @@ void CCalculatorDlg::InitializeUIComponents()
 		m_uiButtons.push_back(CreateNewButton(_T("/"), CRect(269, 185, 341, 226), 25));
 		m_uiButtons.push_back(CreateNewButton(_T("C"), CRect(269, 128, 341, 169), 26));
 		m_uiButtons.push_back(CreateNewButton(_T("√"), CRect(350, 128, 422, 169), 27));
+		m_uiButtons.push_back(CreateNewButton(_T("sin"), CRect(350, 185, 422, 226), 28));
 	}
 
 	//Calculation History Edit Box
 	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOVSCROLL | ES_READONLY | ES_MULTILINE | WS_VSCROLL,
-		CRect(11, 414, 421, 468), 28));
+		CRect(11, 414, 421, 468), 29));
 
 	//Output Edit Box
-	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 29));
+	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 30));
 }
 
 void CCalculatorDlg::InitializeFonts()
@@ -277,4 +320,9 @@ void CCalculatorDlg::SetFonts()
 		btn->SetFont(m_fonts[0]);
 
 	m_textBoxes[1]->SetFont(m_fonts[1]);
+}
+
+bool CCalculatorDlg::IsLastOperationTrigonometric(const wchar_t* c)
+{
+	return *c == L'(';
 }

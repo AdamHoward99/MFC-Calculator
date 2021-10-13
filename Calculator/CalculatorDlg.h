@@ -10,6 +10,7 @@ struct Operation
 {
 	const double number;
 	const wchar_t operation;
+	double precedingNumber;
 };
 
 // CCalculatorDlg dialog
@@ -36,15 +37,25 @@ private:
 	CEdit* CreateNewEditBox(const DWORD&, const CRect&, const int);
 
 	void AddCharToOutput(const wchar_t);
+	void AddStringToOutput(const std::wstring&);		//Used for trigonometric operations
 	void AddNumberToSum(const wchar_t);
 	void SetFonts();
 	bool IsLastInputANumber();
 	bool IsLastInputAnOperation();
+	bool IsLastOperationTrigonometric(const wchar_t*);
 	void CalculateTotal();
-	
-	
+
+	double FindNumberString(size_t, wchar_t*&);
+	inline double FindNumberString(size_t s)
+	{
+		wchar_t* c = &m_outputText[s];
+		return FindNumberString(s, c);
+	}
+
+
 	bool m_decimalActive = false;
 	wchar_t m_lastInput;
+	double m_lastPrecedingNumber = 1.0;
 
 	std::wstring m_outputText = L"";
 	std::wstring m_historyText = L"";
