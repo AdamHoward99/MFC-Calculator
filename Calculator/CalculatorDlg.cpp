@@ -20,7 +20,7 @@ CCalculatorDlg::~CCalculatorDlg()
 }
 
 BEGIN_MESSAGE_MAP(CCalculatorDlg, CDialog)
-	ON_CONTROL_RANGE(BN_CLICKED, 10, 28, &CCalculatorDlg::OnButtonClick)
+	ON_CONTROL_RANGE(BN_CLICKED, 10, 30, &CCalculatorDlg::OnButtonClick)
 END_MESSAGE_MAP()
 
 
@@ -115,7 +115,7 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		return;
 	}
 
-	if (!(nID == 26 || nID == 27 || nID == 28 || IsLastInputANumber()))		//Quits the application earlier when no change will be made
+	if (!(nID > 25 || IsLastInputANumber()))		//Quits the application earlier when no change will be made
 		return;
 
 	//Operations
@@ -175,15 +175,15 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		break;
 
 	case 28:		//sine
-		if (m_lastInput == NULL || IsLastInputAnOperation())		//Nothing or an operation in front of sine
-			AddStringToOutput(L"sinθ(");
+		TrigonometricOperations(L"sinθ(", L's');
+		break;
 
-		//Numbers before the trig operation
-		if (IsLastInputANumber())
-		{
-			AddStringToOutput(L"sinθ(");
-			m_lastPrecedingNumber = FindNumberString(m_outputText.find_first_of(L's'));
-		}
+	case 29:	//cosine
+		TrigonometricOperations(L"cosθ(", L'c');
+		break;
+
+	case 30:	//tangent
+		TrigonometricOperations(L"tanθ(", L't');
 		break;
 	}
 }
@@ -238,6 +238,13 @@ void CCalculatorDlg::CalculateTotal()
 			total +=  var.precedingNumber * sin(var.number);
 			break;
 
+		case L'c':
+			total += var.precedingNumber * cos(var.number);
+			break;
+
+		case L't':
+			total += var.precedingNumber * tan(var.number);
+
 		case L'=':
 			break;
 
@@ -290,14 +297,16 @@ void CCalculatorDlg::InitializeUIComponents()
 		m_uiButtons.push_back(CreateNewButton(_T("C"), CRect(269, 128, 341, 169), 26));
 		m_uiButtons.push_back(CreateNewButton(_T("√"), CRect(350, 128, 422, 169), 27));
 		m_uiButtons.push_back(CreateNewButton(_T("sin"), CRect(350, 185, 422, 226), 28));
+		m_uiButtons.push_back(CreateNewButton(_T("cos"), CRect(350, 242, 422, 283), 29));
+		m_uiButtons.push_back(CreateNewButton(_T("tan"), CRect(350, 299, 422, 340), 30));
 	}
 
 	//Calculation History Edit Box
 	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOVSCROLL | ES_READONLY | ES_MULTILINE | WS_VSCROLL,
-		CRect(11, 414, 421, 468), 29));
+		CRect(11, 414, 421, 468), 31));
 
 	//Output Edit Box
-	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 30));
+	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 32));
 }
 
 void CCalculatorDlg::InitializeFonts()
@@ -325,4 +334,17 @@ void CCalculatorDlg::SetFonts()
 bool CCalculatorDlg::IsLastOperationTrigonometric(const wchar_t* c)
 {
 	return *c == L'(';
+}
+
+void CCalculatorDlg::TrigonometricOperations(const std::wstring& str, const wchar_t& c)
+{
+	if (m_lastInput == NULL || IsLastInputAnOperation())
+		AddStringToOutput(str);
+
+	//Numbers before the operation
+	if (IsLastInputANumber())
+	{
+		AddStringToOutput(str);
+		m_lastPrecedingNumber = FindNumberString(m_outputText.find_first_of(c));
+	}
 }

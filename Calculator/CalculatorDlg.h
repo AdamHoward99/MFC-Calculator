@@ -44,6 +44,7 @@ private:
 	bool IsLastInputAnOperation();
 	bool IsLastOperationTrigonometric(const wchar_t*);
 	void CalculateTotal();
+	void TrigonometricOperations(const std::wstring&, const wchar_t&);
 
 	double FindNumberString(size_t, wchar_t*&);
 	inline double FindNumberString(size_t s)
