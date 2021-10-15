@@ -1,10 +1,9 @@
 <h1 align="center">MFC Calculator</h1>
-<p align="center">This project is a calculator application which supports decimal numbers and operations like addition, subtraction, multiplication and division. The app is created using MFC and is designed to be a sample project. The app is supported on Windows.
-</p>
+<p align="center">This project is a calculator application which supports both common and scientific mathematical operations. The calculator supports addition, subtraction, multiplication, division, square rooting, trigonometric functions, decimal numbers and Pi. The app is created using MFC therefore it is supported on Windows, and is designed to be a sample project.</p>
 
 ## Screenshots
 <p align="center">
-  <img hspace = "10" alt ="Screenshot" src = "https://user-images.githubusercontent.com/74617187/136556934-e93977eb-e7c7-4627-83fc-bebf8a4d9e07.png" height="500" width="400" />
+  <img hspace = "10" alt ="Screenshot" src = "https://user-images.githubusercontent.com/74617187/137497779-66d1535c-0fe9-4c4a-9225-476c24bfaaf5.png" height="500" width="400" />
 </p>
   
 ## How To Use
@@ -20,6 +19,3 @@ Buttons are dynamically created on the MFC dialog window which can be interacted
 
 **Adam Howard**
 - [Profile] (https://github.com/AdamHoward99)
-
-## Future Work
-Considerations will be made in the future to include scientific operations such as trigonometric functions, square rooting and exponents.
