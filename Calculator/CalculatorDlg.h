@@ -4,7 +4,7 @@
 
 #define DIALOG_ID 102
 #define MAINFRAME_ID 128
-
+#define PI 3.14159265359
 
 struct Operation
 {
@@ -45,6 +45,7 @@ private:
 	bool IsLastOperationTrigonometric(const wchar_t*);
 	void CalculateTotal();
 	void TrigonometricOperations(const std::wstring&, const wchar_t&);
+	void FinishSum();
 
 	double FindNumberString(size_t, wchar_t*&);
 	inline double FindNumberString(size_t s)
@@ -52,7 +53,6 @@ private:
 		wchar_t* c = &m_outputText[s];
 		return FindNumberString(s, c);
 	}
-
 
 	bool m_decimalActive = false;
 	wchar_t m_lastInput;

@@ -20,9 +20,8 @@ CCalculatorDlg::~CCalculatorDlg()
 }
 
 BEGIN_MESSAGE_MAP(CCalculatorDlg, CDialog)
-	ON_CONTROL_RANGE(BN_CLICKED, 10, 30, &CCalculatorDlg::OnButtonClick)
+	ON_CONTROL_RANGE(BN_CLICKED, 10, 31, &CCalculatorDlg::OnButtonClick)
 END_MESSAGE_MAP()
-
 
 // CCalculatorDlg message handlers
 
@@ -97,6 +96,12 @@ double CCalculatorDlg::FindNumberString(size_t start, wchar_t*& op)
 {
 	size_t size = 0;
 
+	if (*op == L'π')
+	{
+		op--;
+		return PI;
+	}
+
 	do
 	{
 		start--;
@@ -109,13 +114,13 @@ double CCalculatorDlg::FindNumberString(size_t start, wchar_t*& op)
 
 void CCalculatorDlg::OnButtonClick(UINT nID)
 {
-	if (nID < 20)		//10-19 is number buttons, put this in a bool check function maybe
+	if (nID < 20)		//10-19 is number buttons
 	{
 		AddCharToOutput(L'0' + (nID - 10));
 		return;
 	}
 
-	if (!(nID > 25 || IsLastInputANumber()))		//Quits the application earlier when no change will be made
+	if (!(nID > 25 || IsLastInputANumber() || m_lastInput == L'π'))		//Quits the application earlier when no change will be made
 		return;
 
 	//Operations
@@ -136,14 +141,7 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		m_lastInput = NULL;
 
 		CalculateTotal();
-
-		//Update Text based on total
-		m_historyText += m_totalText + L"\r\n";
-		m_textBoxes[0]->SetWindowTextW(m_historyText.c_str());
-		m_textBoxes[1]->SetWindowTextW(m_totalText.c_str());		//Output total value of sum to output box
-		UpdateData(FALSE);
-		m_totalText.clear();
-		m_sum.clear();
+		FinishSum();
 		break;
 
 	case 22:		//Add
@@ -162,11 +160,9 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 		AddNumberToSum(L'/');
 		break;
 
-	case 26:		//Clear
-		m_outputText.clear();
-		m_lastInput = NULL;
-		m_textBoxes[1]->SetWindowTextW(m_outputText.c_str());
-		UpdateData(FALSE);
+	case 26:	//PI
+		if (IsLastInputAnOperation() || m_lastInput == NULL)
+			AddCharToOutput(L'π');
 		break;
 
 	case 27:		//Square Root
@@ -184,6 +180,14 @@ void CCalculatorDlg::OnButtonClick(UINT nID)
 
 	case 30:	//tangent
 		TrigonometricOperations(L"tanθ(", L't');
+		break;
+
+	case 31:		//Clear
+		m_outputText.clear();
+		m_lastInput = NULL;
+		m_decimalActive = false;
+		m_textBoxes[1]->SetWindowTextW(m_outputText.c_str());
+		UpdateData(FALSE);
 		break;
 	}
 }
@@ -244,6 +248,7 @@ void CCalculatorDlg::CalculateTotal()
 
 		case L't':
 			total += var.precedingNumber * tan(var.number);
+			break;
 
 		case L'=':
 			break;
@@ -294,19 +299,20 @@ void CCalculatorDlg::InitializeUIComponents()
 		m_uiButtons.push_back(CreateNewButton(_T("-"), CRect(269, 299, 341, 340), 23));
 		m_uiButtons.push_back(CreateNewButton(_T("x"), CRect(269, 242, 341, 283), 24));
 		m_uiButtons.push_back(CreateNewButton(_T("/"), CRect(269, 185, 341, 226), 25));
-		m_uiButtons.push_back(CreateNewButton(_T("C"), CRect(269, 128, 341, 169), 26));
+		m_uiButtons.push_back(CreateNewButton(_T("π"), CRect(350, 354, 422, 395), 26));
 		m_uiButtons.push_back(CreateNewButton(_T("√"), CRect(350, 128, 422, 169), 27));
 		m_uiButtons.push_back(CreateNewButton(_T("sin"), CRect(350, 185, 422, 226), 28));
 		m_uiButtons.push_back(CreateNewButton(_T("cos"), CRect(350, 242, 422, 283), 29));
 		m_uiButtons.push_back(CreateNewButton(_T("tan"), CRect(350, 299, 422, 340), 30));
+		m_uiButtons.push_back(CreateNewButton(_T("C"), CRect(269, 128, 341, 169), 31));
 	}
 
 	//Calculation History Edit Box
 	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOVSCROLL | ES_READONLY | ES_MULTILINE | WS_VSCROLL,
-		CRect(11, 414, 421, 468), 31));
+		CRect(11, 414, 421, 468), 32));
 
 	//Output Edit Box
-	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 32));
+	m_textBoxes.push_back(CreateNewEditBox(WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_READONLY | ES_RIGHT, CRect(11, 28, 421, 83), 33));
 }
 
 void CCalculatorDlg::InitializeFonts()
@@ -347,4 +353,15 @@ void CCalculatorDlg::TrigonometricOperations(const std::wstring& str, const wcha
 		AddStringToOutput(str);
 		m_lastPrecedingNumber = FindNumberString(m_outputText.find_first_of(c));
 	}
+}
+
+void CCalculatorDlg::FinishSum()
+{
+	//Update Text based on total
+	m_historyText += m_totalText + L"\r\n";
+	m_textBoxes[0]->SetWindowTextW(m_historyText.c_str());
+	m_textBoxes[1]->SetWindowTextW(m_totalText.c_str());		//Output total value of sum to output box
+	UpdateData(FALSE);
+	m_totalText.clear();
+	m_sum.clear();
 }
