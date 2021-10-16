@@ -50,7 +50,7 @@ private:
 	double FindNumberString(size_t, wchar_t*&);
 	inline double FindNumberString(size_t s)
 	{
-		wchar_t* c = &m_outputText[s];
+		wchar_t* c = &m_outputText[s - 1];
 		return FindNumberString(s, c);
 	}
 

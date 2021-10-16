@@ -102,19 +102,19 @@ double CCalculatorDlg::FindNumberString(size_t start, wchar_t*& op)
 		return PI;
 	}
 
-	do
+	while (start > 0 && (*op >= L'0' && *op <= L'9') || *op == L'.')
 	{
 		start--;
 		size++;
 		op--;
-	} while (start > 0 && (*op >= L'0' && *op <= L'9') || *op == L'.');
+	}
 
 	return std::stod(m_outputText.substr(start, size));
 }
 
 void CCalculatorDlg::OnButtonClick(UINT nID)
 {
-	if (nID < 20)		//10-19 is number buttons
+	if (nID < 20 && m_lastInput != L'π')		//10-19 is number buttons
 	{
 		AddCharToOutput(L'0' + (nID - 10));
 		return;
@@ -351,7 +351,7 @@ void CCalculatorDlg::TrigonometricOperations(const std::wstring& str, const wcha
 	if (IsLastInputANumber())
 	{
 		AddStringToOutput(str);
-		m_lastPrecedingNumber = FindNumberString(m_outputText.find_first_of(c));
+		m_lastPrecedingNumber = FindNumberString(m_outputText.find_last_of(c));
 	}
 }
 
